@@ -94,7 +94,7 @@ class user_controller():
     # send mail to user
     def send_mail(self, user):
             check = connect.users.find_one({"email":user["email"]})
-            if check["verified"]==1:
+            if check["verified"]=="1":
                 return make_response({"success":"false","message":"user already verified"},200)
             else:
                 encoded_jwt = jwt.encode({"email":user["email"]},environ.get("SECRET"),algorithm="HS256")
