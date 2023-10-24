@@ -43,33 +43,40 @@ class user_controller():
             # hash password
             hashed = bcrypt.hashpw(user["password"].encode('utf-8'), bcrypt.gensalt())
             user["password"]=hashed
+            user["verified"]="0"
             # try inserting user
             user_id = users.insert_one(user).inserted_id
-            return make_response({"success":"true","message":"user created successfully","data":str(user_id)})
+            # send mail for verification
+            self.send_mail(user)
+
+            return make_response({"success":"true","message":"user created successfully and verification mail sent!","data":str(user_id)})
     
     # login control  
     def login(self, user):
         users=connect.users
         # check if user exists
-        try:
-            check = users.find_one({"email":user["email"]})
-            if check:
-                # if user exists, check if he is verified.
-                if check["verified"]==1:
-                    # now validate credentials
-                    if bcrypt.checkpw(user["password"],check["password"]):
-                        return make_response({"success":"true","message":"successfully logged in","data":{
-                            jwt.encode(check,"secret", algorithm="HS256")}},200)
-                    else:
-                       return make_response({"success":"false","message":"password does not match"},200)
-                    
+
+        check = users.find_one({"email":user["email"]})
+
+        print(check)
+        if len(list(check)):
+            # if user exists, check if he is verified.
+            if check["verified"]=="1":
+                # now validate credentials
+                if bcrypt.checkpw(user["password"].encode("utf-8"),check["password"]):
+                    #create a payload
+                    payload = jwt.encode({
+                        "email": check["email"]
+                    },"secret",algorithm="HS256")
+                    return make_response({"success":"true","message":"successfully logged in","data":payload},200)
                 else:
-                    return make_response({"success":"false","message":"user not verified"},200)
-            # if user does not exist return
+                    return make_response({"success":"false","message":"password does not match"},200)
             else:
-                return make_response({"success":"false","message":"user already exists"},200)
-        except Exception as e:
-            return make_response({"success":"false","message":"user does not exist"},200)
+                return make_response({"success":"false","message":"user not verified"},200)
+        # if user does not exist return
+        else:
+            return make_response({"success":"false","message":"user already exists"},200)
+
     
     # verification control
     def verify(self, token):
