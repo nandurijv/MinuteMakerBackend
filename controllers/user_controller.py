@@ -67,7 +67,7 @@ class user_controller():
                     #create a payload
                     payload = jwt.encode({
                         "email": check["email"]
-                    },"secret",algorithm="HS256")
+                    },environ.get("SECRET"),algorithm="HS256")
                     return make_response({"success":"true","message":"successfully logged in","data":payload},200)
                 else:
                     return make_response({"success":"false","message":"password does not match"},200)

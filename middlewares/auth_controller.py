@@ -10,11 +10,11 @@ class auth_model():
         def decorated_func(*args):
             token = str(request.headers.get('Authorization'))
             if re.match("^Bearer *([^ ]+) *$",token,flags=0):
-                token = str(token.split(' ')[1])
+                token = token.split(' ')[1]
                 try:
-                    key = str(os.getenv("SECRET_KEY"))
+                    key = os.getenv("SECRET")
                     user = jwt.decode(token, key, algorithms = "HS256")
-                    request.user= {"id":user['user']}
+                    request.user= {"id":user['email']}
                     return func(*args)
                 except Exception as e:
                     print(e)
