@@ -124,12 +124,15 @@ class minutes_controller():
         except Exception:
             return make_response({"success":"false","message":"server error"},500)
         
-    def generateminutes(self,request):
-        print("OPENAI API KEY"+ environ.get("OPENAI_API_KEY"))
+    def generateminutesbyaudio(self,request):
         f = request.files["audio"]
         path="samples/"+f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
+        data = self.meeting_minutes(transcription)
+        return make_response({"success":"true","message":"successfully generated minutes","data":data},200)
+    
+    def generateminutesbytranscript(self,transcription):
         data = self.meeting_minutes(transcription)
         return make_response({"success":"true","message":"successfully generated minutes","data":data},200)
     

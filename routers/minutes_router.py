@@ -17,10 +17,17 @@ def getminutesbyid():
     # id = request.json["id"]
     return obj.getminutesbyid("653b5a5cdd8dd0ccb4e8e06e")
 
-@app.route("/minutes/generate", methods=["POST"])
+@app.route("/minutes/generate/audio", methods=["POST"])
 @authenticator.token_auth
-def generateminutes():
-    return obj.generateminutes(request)
+def generateminutesbyaudio():
+    return obj.generateminutesbyaudio(request)
+
+@app.route("/minutes/generate/transcript", methods=["POST"])
+@authenticator.token_auth
+def generateminutesbytranscript():
+    transcript = request.json["transcript"]
+    return obj.generateminutesbytranscript(transcript)
+
 
 @app.route("/minutes/save", methods=["POST"])
 @authenticator.token_auth
