@@ -10,3 +10,9 @@ authenticator=auth_model()
 @authenticator.token_auth
 def getallminutes():
     return obj.getall()
+
+
+@app.route("/minutes/add", methods=["POST"])
+@authenticator.token_auth
+def addminutes():
+    return obj.addminutes(request)

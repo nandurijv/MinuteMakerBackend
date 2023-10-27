@@ -109,5 +109,11 @@ class minutes_controller():
     def getall(self):
         return make_response({"success":"true","message":"retrieved all the minutes"},200)
 
-    def addminutes(self):
-        return make_response({"success":"true","message":"minutes added successfully"},200)
+    def addminutes(self,request):
+        print("OPENAI API KEY"+ environ.get("OPENAI_API_KEY"))
+        f = request.files["audio"]
+        path="samples/"+f.filename
+        f.save(path)
+        transcription = self.transcribe_audio(path)
+        data = self.meeting_minutes(transcription)
+        return make_response({"success":"true","message":data},200)
