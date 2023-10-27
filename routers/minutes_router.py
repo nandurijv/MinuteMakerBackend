@@ -11,8 +11,18 @@ authenticator=auth_model()
 def getallminutes():
     return obj.getall()
 
-
-@app.route("/minutes/add", methods=["POST"])
+@app.route("/minutes/getminutesbyid", methods=["POST"])
 @authenticator.token_auth
-def addminutes():
-    return obj.addminutes(request)
+def getminutesbyid():
+    # id = request.json["id"]
+    return obj.getminutesbyid("653b5a5cdd8dd0ccb4e8e06e")
+
+@app.route("/minutes/generate", methods=["POST"])
+@authenticator.token_auth
+def generateminutes():
+    return obj.generateminutes(request)
+
+@app.route("/minutes/save", methods=["POST"])
+@authenticator.token_auth
+def saveminutes():
+    return obj.saveminutes(request)

@@ -1,11 +1,14 @@
 from app import connect
-from flask import make_response,request
-from bson.json_util import dumps, loads
+from flask import make_response
+from models.minute_model import Minutes
 from bson import ObjectId
 from pydantic import ValidationError
 from os import environ
-import openai
 from docx import Document
+from bson.json_util import dumps
+from bson.objectid import ObjectId
+import openai
+import json
 
 class minutes_controller():
 
@@ -107,13 +110,47 @@ class minutes_controller():
         doc.save(filename)
 
     def getall(self):
-        return make_response({"success":"true","message":"retrieved all the minutes"},200)
-
-    def addminutes(self,request):
+        minutes = connect.minutes
+        try:
+            minutes = minutes.find()
+            return make_response({"success":"true","data":json.loads(dumps(list(minutes)))},200)
+        except:
+            return make_response({"success":"true","message":"server error"},400)
+    
+    def getminutesbyid(self, id):
+        try:
+            minutes = connect.minutes.find({"_id":ObjectId(id)})
+            return make_response({"success":"true","message":"users retrieved successfully","data":json.loads(dumps(list(minutes)))},200)
+        except Exception:
+            return make_response({"success":"false","message":"server error"},500)
+        
+    def generateminutes(self,request):
         print("OPENAI API KEY"+ environ.get("OPENAI_API_KEY"))
         f = request.files["audio"]
         path="samples/"+f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
         data = self.meeting_minutes(transcription)
-        return make_response({"success":"true","message":data},200)
+        return make_response({"success":"true","message":"successfully generated minutes","data":data},200)
+    
+    def saveminutes(self,request):
+        #get the collections
+        minutes = connect.minutes
+        users = connect.users
+
+        #check minutes format
+        try:
+            data = request.json
+            Minutes(**data)
+        except ValidationError as e:
+            return make_response({"success":"false","message":",".join([msg["msg"] for msg in e.errors()])},200)
+        #add minutes with the user id
+        #add the minute with the user id
+        try:
+            user = users.find_one({"email":request.user["email"]})
+            minute_id = minutes.insert_one(request.json)
+            #return the response
+            return make_response({"success":"true","message":"successfully saved minutes"},200)
+        except:
+            return make_response({"success":"false","message":"server error"},500)
+    
