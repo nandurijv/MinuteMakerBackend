@@ -1,15 +1,15 @@
-from app import connect
-from flask import make_response
+from app import connect, app
+from flask import make_response,send_from_directory
 from models.minute_model import Minutes
 from bson import ObjectId
 from pydantic import ValidationError
-from os import environ
 from docx import Document
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 import openai
 import json
-
+from os import environ
+from datetime import datetime
 class minutes_controller():
 
     def transcribe_audio(self, audio_file_path):
@@ -107,7 +107,8 @@ class minutes_controller():
             doc.add_paragraph(value)
             # Add a line break between sections
             doc.add_paragraph()
-        doc.save(filename)
+        doc.save('docs/'+filename)
+        return make_response({"success":"true","message":"file downloaded successfully","data":environ.get("BASE_URL")+"/docs/"+filename})
 
     def getall(self):
         minutes = connect.minutes
@@ -125,15 +126,22 @@ class minutes_controller():
             return make_response({"success":"false","message":"server error"},500)
         
     def generateminutesbyaudio(self,request):
-        f = request.files["audio"]
-        path="samples/"+f.filename
+        f = request.files["file"]
+        print(f)
+        path="samples/audio/"+f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
         data = self.meeting_minutes(transcription)
         return make_response({"success":"true","message":"successfully generated minutes","data":data},200)
     
-    def generateminutesbytranscript(self,transcription):
+    def generateminutesbytranscript(self,request):
+        f = request.files["file"]
+        path="samples/transcripts/"+f.filename
+        f.save(path)
+        with open(path) as f:
+            transcription=f.read()
         data = self.meeting_minutes(transcription)
+        # data = transcription
         return make_response({"success":"true","message":"successfully generated minutes","data":data},200)
     
     def saveminutes(self,request):
@@ -156,4 +164,3 @@ class minutes_controller():
             return make_response({"success":"true","message":"successfully saved minutes"},200)
         except:
             return make_response({"success":"false","message":"server error"},500)
-    
