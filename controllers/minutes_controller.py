@@ -129,7 +129,7 @@ class minutes_controller:
         # doc.add_paragraph(minutes["sentiment_analysis"])
         # doc.add_paragraph()
         # save the document
-        path = "temp/" + minutes["title"].split(":")[0]+".docx"
+        path = "tmp/" + minutes["title"].split(":")[0]+".docx"
         doc.save(path)
         # return json
         return make_response(
@@ -167,7 +167,7 @@ class minutes_controller:
 
     def generateminutesbyaudio(self, request):
         f = request.files["file"]
-        path = "temp/" + f.filename
+        path = "tmp/" + f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
         data = self.meeting_minutes(transcription)
@@ -182,7 +182,7 @@ class minutes_controller:
 
     def generateminutesbytranscript(self, request):
         f = request.files["file"]
-        path = "temp/" + f.filename
+        path = "tmp/" + f.filename
         f.save(path)
         with open(path) as f:
             transcription = f.read()
@@ -220,7 +220,7 @@ class minutes_controller:
         user = users.find_one({"email": request.user["email"]})
         data = request.json
         data["user_id"] = str(user["_id"])
-        data["download_link"] = urllib.parse.quote(environ.get("BASE_URL")+"/temp/" + data["title"].split(":")[0]+".docx")
+        data["download_link"] = urllib.parse.quote(environ.get("BASE_URL")+"/tmp/" + data["title"].split(":")[0]+".docx")
         minute_id = minutes.insert_one(data).inserted_id
         self.save_as_docx(request.json)
         # return the response
