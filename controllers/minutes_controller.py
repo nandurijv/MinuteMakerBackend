@@ -129,7 +129,7 @@ class minutes_controller:
         # doc.add_paragraph(minutes["sentiment_analysis"])
         # doc.add_paragraph()
         # save the document
-        path = "tmp/" + minutes["title"].split(":")[0]+".docx"
+        path = "/tmp/" + minutes["title"].split(":")[0]+".docx"
         doc.save(path)
         # return json
         return make_response(
@@ -167,7 +167,7 @@ class minutes_controller:
 
     def generateminutesbyaudio(self, request):
         f = request.files["file"]
-        path = "tmp/" + f.filename
+        path = "/tmp/" + f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
         data = self.meeting_minutes(transcription)
@@ -182,7 +182,7 @@ class minutes_controller:
 
     def generateminutesbytranscript(self, request):
         f = request.files["file"]
-        path = "tmp/" + f.filename
+        path = "/tmp/" + f.filename
         f.save(path)
         with open(path) as f:
             transcription = f.read()
