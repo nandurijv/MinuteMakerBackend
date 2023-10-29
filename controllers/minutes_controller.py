@@ -14,7 +14,7 @@ from docx import Document
 from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import RGBColor
-
+import urllib.parse
 
 class minutes_controller:
     def transcribe_audio(self, audio_file_path):
@@ -23,7 +23,6 @@ class minutes_controller:
         return transcription["text"]
 
     def abstract_summary_extraction(self, transcription):
-        print("getting abstract summary")
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             temperature=0,
@@ -35,11 +34,9 @@ class minutes_controller:
                 {"role": "user", "content": transcription},
             ],
         )
-        print("summary is: ", response["choices"][0]["message"]["content"])
         return response["choices"][0]["message"]["content"]
 
     def key_points_extraction(self, transcription):
-        print("getting key points")
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             temperature=0,
@@ -51,11 +48,9 @@ class minutes_controller:
                 {"role": "user", "content": transcription},
             ],
         )
-        print("key points: ", response["choices"][0]["message"]["content"])
         return response["choices"][0]["message"]["content"]
 
     def action_item_extraction(self, transcription):
-        print("getting action_item")
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             temperature=0,
@@ -67,11 +62,9 @@ class minutes_controller:
                 {"role": "user", "content": transcription},
             ],
         )
-        print("action item:", response["choices"][0]["message"]["content"])
         return response["choices"][0]["message"]["content"]
 
     def sentiment_analysis(self, transcription):
-        print("getting sentiment analysis")
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             temperature=0,
@@ -83,7 +76,6 @@ class minutes_controller:
                 {"role": "user", "content": transcription},
             ],
         )
-        print("sentiment analysis:", response["choices"][0]["message"]["content"])
         return response["choices"][0]["message"]["content"]
 
     def meeting_minutes(self, transcription):
@@ -175,7 +167,6 @@ class minutes_controller:
 
     def generateminutesbyaudio(self, request):
         f = request.files["file"]
-        print(f)
         path = "samples/audio/" + f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
@@ -190,13 +181,11 @@ class minutes_controller:
         )
 
     def generateminutesbytranscript(self, request):
-        print("reading file")
         f = request.files["file"]
         path = "samples/transcripts/" + f.filename
         f.save(path)
         with open(path) as f:
             transcription = f.read()
-        print("sending minutes to gpt")
         data = self.meeting_minutes(transcription)
 
         # data = transcription
@@ -231,7 +220,7 @@ class minutes_controller:
         user = users.find_one({"email": request.user["email"]})
         data = request.json
         data["user_id"] = str(user["_id"])
-        data["download_link"] = environ.get("BASE_URL")+"/docs/" + data["title"].split(":")[0]+".docx"
+        data["download_link"] = urllib.parse.quote(environ.get("BASE_URL")+"/docs/" + data["title"].split(":")[0]+".docx")
         minute_id = minutes.insert_one(data).inserted_id
         self.save_as_docx(request.json)
         # return the response
