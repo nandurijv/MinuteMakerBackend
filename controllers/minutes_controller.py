@@ -129,7 +129,7 @@ class minutes_controller:
         # doc.add_paragraph(minutes["sentiment_analysis"])
         # doc.add_paragraph()
         # save the document
-        path = "docs/" + minutes["title"].split(":")[0]+".docx"
+        path = "temp/" + minutes["title"].split(":")[0]+".docx"
         doc.save(path)
         # return json
         return make_response(
@@ -220,7 +220,7 @@ class minutes_controller:
         user = users.find_one({"email": request.user["email"]})
         data = request.json
         data["user_id"] = str(user["_id"])
-        data["download_link"] = urllib.parse.quote(environ.get("BASE_URL")+"/docs/" + data["title"].split(":")[0]+".docx")
+        data["download_link"] = urllib.parse.quote(environ.get("BASE_URL")+"/temp/" + data["title"].split(":")[0]+".docx")
         minute_id = minutes.insert_one(data).inserted_id
         self.save_as_docx(request.json)
         # return the response
