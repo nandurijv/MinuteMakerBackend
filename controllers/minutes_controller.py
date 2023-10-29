@@ -90,7 +90,7 @@ class minutes_controller:
         abstract_summary = self.abstract_summary_extraction(transcription)
         temp = abstract_summary.split("Summary: ")
         abstract_summary = temp[1]
-        title = temp[0].split("Title: ")
+        title = temp[0].split("Title: ")[1]
         key_points = self.key_points_extraction(transcription)
         action_items = self.action_item_extraction(transcription)
         # sentiment = self.sentiment_analysis(transcription)
@@ -104,23 +104,23 @@ class minutes_controller:
             # "sentiment": sentiment,
         }
 
-    def save_as_docx(self, minutes, filename):
+    def save_as_docx(self, minutes):
         doc = Document()
         # Create a paragraph for the title
         title = doc.add_paragraph("BuzzMinutes")
         # Set the font size and color for the title
         title.runs[0].font.size = Pt(24)  # You can adjust the size as needed
-        title.runs[0].font.color.rgb = RGBColor(0x00, 0x00, 0xFF)  # Blue color
+        title.runs[0].font.color.rgb = RGBColor(0x0C, 0x35, 0x6A)  # Blue color
         # Center align the title
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         title = doc.add_paragraph(minutes["title"])
         # Set the font size and color for the title
         title.runs[0].font.size = Pt(20)  # You can adjust the size as needed
-        title.runs[0].font.color.rgb = RGBColor(0xFF, 0x00, 0x00)  # Blue color
+        title.runs[0].font.color.rgb = RGBColor(0xFF, 0x00, 0x00)  # RED color
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # add abstract summry
+        # add abstract summary
         doc.add_heading("Abstract Summary", level=1)
         doc.add_paragraph(minutes["abstract_summary"])
         # doc.add_paragraph()
@@ -137,16 +137,15 @@ class minutes_controller:
         # doc.add_paragraph(minutes["sentiment_analysis"])
         # doc.add_paragraph()
         # save the document
-        doc.save("docs/" + filename + datetime.now().strftime("%m_%d_%Y")+".docx")
+        path = "docs/" + minutes["title"].split(":")[0]+".docx"
+        doc.save(path)
         # return json
         return make_response(
             {
                 "success": "true",
                 "message": "file downloaded successfully",
                 "data": environ.get("BASE_URL")
-                + "/docs/"
-                + filename
-                + datetime.now().strftime("%m_%d_%Y")+".docx",
+                + "/" + path,
             }
         )
 
@@ -214,7 +213,6 @@ class minutes_controller:
         # get the collections
         minutes = connect.minutes
         users = connect.users
-
         # check minutes format
         try:
             data = request.json
@@ -229,14 +227,15 @@ class minutes_controller:
             )
         # add minutes with the user id
         # add the minute with the user id
-        try:
-            user = users.find_one({"email": request.user["email"]})
-            data = request.json["user_id"] = str(user["_id"])
-            minute_id = minutes.insert_one(data)
-            self.save_as_docx(request.json, request.json["title"])
-            # return the response
-            return make_response(
-                {"success": "true", "message": "successfully saved minutes"}, 200
-            )
-        except:
-            return make_response({"success": "false", "message": "server error"}, 500)
+
+        user = users.find_one({"email": request.user["email"]})
+        data = request.json
+        data["user_id"] = str(user["_id"])
+        data["download_link"] = environ.get("BASE_URL")+"/docs/" + data["title"].split(":")[0]+".docx"
+        minute_id = minutes.insert_one(data).inserted_id
+        self.save_as_docx(request.json)
+        # return the response
+        return make_response(
+            {"success": "true", "message": "successfully saved minutes","data":str(minute_id)}, 200
+        )
+

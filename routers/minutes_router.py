@@ -35,4 +35,4 @@ def saveminutes():
 @app.route("/minutes/download", methods=["POST"])
 @authenticator.token_auth
 def downloadminutes():
-    return obj.save_as_docx(request.json,"BuzzMinutes")
+    return obj.save_as_docx(request.json)
