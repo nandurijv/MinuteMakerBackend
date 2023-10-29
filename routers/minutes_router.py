@@ -27,7 +27,6 @@ def generateminutesbyaudio():
 def generateminutesbytranscript():
     return obj.generateminutesbytranscript(request)
 
-
 @app.route("/minutes/save", methods=["POST"])
 @authenticator.token_auth
 def saveminutes():
@@ -36,4 +35,4 @@ def saveminutes():
 @app.route("/minutes/download", methods=["POST"])
 @authenticator.token_auth
 def downloadminutes():
-    return obj.save_as_docx(request.json,"BuzzMinutes.docx")
+    return obj.save_as_docx(request.json,"BuzzMinutes")

@@ -55,11 +55,9 @@ class user_controller():
     def login(self, user):
         users=connect.users
         # check if user exists
-
         check = users.find_one({"email":user["email"]})
-
         print(check)
-        if len(list(check)):
+        if check is not None:
             # if user exists, check if he is verified.
             if check["verified"]=="1":
                 # now validate credentials
@@ -75,7 +73,7 @@ class user_controller():
                 return make_response({"success":"false","message":"user not verified"},200)
         # if user does not exist return
         else:
-            return make_response({"success":"false","message":"user already exists"},200)
+            return make_response({"success":"false","message":"user does not exist"},200)
 
     
     # verification control
