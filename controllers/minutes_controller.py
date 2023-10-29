@@ -167,7 +167,7 @@ class minutes_controller:
 
     def generateminutesbyaudio(self, request):
         f = request.files["file"]
-        path = "samples/audio/" + f.filename
+        path = "temp/" + f.filename
         f.save(path)
         transcription = self.transcribe_audio(path)
         data = self.meeting_minutes(transcription)
@@ -182,7 +182,7 @@ class minutes_controller:
 
     def generateminutesbytranscript(self, request):
         f = request.files["file"]
-        path = "samples/transcripts/" + f.filename
+        path = "temp/" + f.filename
         f.save(path)
         with open(path) as f:
             transcription = f.read()
