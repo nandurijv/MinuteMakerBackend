@@ -1,5 +1,5 @@
 from middlewares.auth_controller import auth_model
-from app import app
+from app import app, cross_origin
 from controllers.minutes_controller import minutes_controller
 from flask import request
 
@@ -14,8 +14,8 @@ def getallminutes():
 @app.route("/minutes/getminutesbyid", methods=["POST"])
 @authenticator.token_auth
 def getminutesbyid():
-    # id = request.json["id"]
-    return obj.getminutesbyid("653b5a5cdd8dd0ccb4e8e06e")
+    id = request.json["id"]
+    return obj.getminutesbyid(id)
 
 @app.route("/minutes/generate/audio", methods=["POST"])
 @authenticator.token_auth
@@ -36,3 +36,15 @@ def saveminutes():
 @authenticator.token_auth
 def downloadminutes():
     return obj.save_as_docx(request.json)
+
+@app.route("/minutes/delete", methods=["DELETE"])
+@authenticator.token_auth
+def deleteminutes():
+    id = request.json["id"]
+    return obj.deleteminute(id)
+
+@app.route("/minutes/update", methods=["PUT"])
+@cross_origin()
+@authenticator.token_auth
+def updateminutes():
+    return obj.updateminute(request.json)

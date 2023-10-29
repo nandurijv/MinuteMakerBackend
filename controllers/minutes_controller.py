@@ -238,4 +238,20 @@ class minutes_controller:
         return make_response(
             {"success": "true", "message": "successfully saved minutes","data":str(minute_id)}, 200
         )
-
+    
+    def deleteminute(self, id):
+        try:
+            minutes = connect.minutes
+            minutes.delete_one({"_id":ObjectId(id)})
+            return make_response({"success":"true","message":"document deleted successfully"},200)
+        except:
+            return make_response({"success":"false","message":"server error"},400)
+        
+    def updateminute(self, request):
+        try:
+            minutes = connect.minutes
+            request["data"]["_id"] = ObjectId(request["data"]["_id"]["$oid"])
+            minutes.find_one_and_update({"_id":ObjectId(request["id"])},{"$set":request["data"]})
+            return make_response({"success":"true","message":"document updated successfully"},200)
+        except:
+            return make_response({"success":"false","message":"server error"},400)
