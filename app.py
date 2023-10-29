@@ -16,7 +16,7 @@ app.config.update(dict(
     UPLOAD_FOLDER="docs"
 ))
 mail = Mail(app)
-cors = CORS(app, origins=["http://localhost:3000"])
+cors = CORS(app, origins=["http://localhost:3000","https://minutes-maker.vercel.app"])
 
 # connect to database
 connect = connection().connect()
