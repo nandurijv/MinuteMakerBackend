@@ -16,7 +16,7 @@ app.config.update(dict(
     UPLOAD_FOLDER="docs"
 ))
 mail = Mail(app)
-cors = CORS(app)
+cors = CORS(app, origins=["http://localhost:3000"])
 
 # connect to database
 connect = connection().connect()
