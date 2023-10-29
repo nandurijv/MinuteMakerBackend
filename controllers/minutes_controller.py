@@ -154,7 +154,7 @@ class minutes_controller:
         try:
             minutes = minutes.find()
             return make_response(
-                {"success": "true", "data": json.loads(dumps(list(minutes)))}, 200
+                {"success": "true","message":"all minutes retrieved successfully", "data": json.loads(dumps(list(minutes)))}, 200
             )
         except:
             return make_response({"success": "true", "message": "server error"}, 400)
@@ -165,7 +165,7 @@ class minutes_controller:
             return make_response(
                 {
                     "success": "true",
-                    "message": "users retrieved successfully",
+                    "message": "minute retrieved successfully",
                     "data": json.loads(dumps(list(minutes))),
                 },
                 200,
