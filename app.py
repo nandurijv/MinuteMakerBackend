@@ -4,7 +4,7 @@ from flask_mail import Mail
 from flask_cors import CORS, cross_origin
 import os
 # initialise flask application
-app= Flask(__name__,static_folder='docs')
+app= Flask(__name__,static_folder='tmp')
 app.config.update(dict(
     DEBUG = True,
     MAIL_SERVER = 'smtp.gmail.com',
@@ -13,7 +13,7 @@ app.config.update(dict(
     MAIL_USE_SSL = False,
     MAIL_USERNAME = os.getenv("SENDER_MAIL"),
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD"),
-    UPLOAD_FOLDER="docs"
+    UPLOAD_FOLDER="tmp"
 ))
 mail = Mail(app)
 cors = CORS(app, origins=["http://localhost:3000","https://minutes-maker.vercel.app"])
