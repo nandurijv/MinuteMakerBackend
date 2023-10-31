@@ -216,7 +216,6 @@ class minutes_controller:
             )
         # add minutes with the user id
         # add the minute with the user id
-
         user = users.find_one({"email": request.user["email"]})
         data = request.json
         data["user_id"] = str(user["_id"])
