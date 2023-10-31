@@ -53,7 +53,7 @@ def updateminutes():
 
 @app.route("/minutes/summary", methods=["POST"])
 @cross_origin()
-@authenticator.token_auth
+# @authenticator.token_auth
 def getsummary():
     try:
         endpoint = "https://1b04-34-170-240-137.ngrok.io" # Replace with your endpoint
